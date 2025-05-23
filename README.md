@@ -1,6 +1,17 @@
-# Project Title :  Tac Toe Game
+# 🎮 Blink Tac Toe
 
-=> A twisted version  of Tic Tac Toe with vanishing emojiis! Built with React.js.
+A modern twist on the classic Tic Tac Toe game with emojis, vanishing mechanics, and strategic gameplay!
 
-Live Demo : 
-GitHub Repository: 
+![Game Preview](https://via.placeholder.com/800x500.png?text=Blink+Tac+Toe+Preview)
+
+## 🚀 Features
+
+- **🎨 Multiple Emoji Categories**: Choose from 6 unique themes (Animals, Food, Sports, etc.)
+- **✨ Vanishing Mechanics**: Limited to 3 emojis on board - oldest disappears when placing new ones
+- **🔊 Sound Effects**: Custom sound feedback for moves and wins
+
+
+## ⚙️ Installation
+
+
+  
