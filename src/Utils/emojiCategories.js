@@ -11,7 +11,7 @@ export const EMOJI_CATEGORIES = {
   },
   SPORTS: {
     name: 'Sports',
-    emojis: ['⚽', '🏀', '🏈', '🎾', ],// '🏐', '🏓', '🏸', '🥎'
+    emojis: ['⚽', '🏀', '🏈', '🏐', ],// ', '🏓', '🏸', '🥎'
     icon: '🏆'
   },
   NATURE: {
@@ -26,12 +26,16 @@ export const EMOJI_CATEGORIES = {
   },
   FRUITS: {
     name: 'Fruits',
-    emojis: ['🍎', '🍊', '🍌', '🍇'], // '🍓', '🥝', '🍑', '🥭'
+    emojis: ['🍎', '🍌','🍓', '🍇'], // '🍓', '🥝', '🍑', '🥭'
     icon: '🍎'
   }
 };
 
-export const getRandomEmoji = (category) => {
-  const emojis = EMOJI_CATEGORIES[category].emojis;
-  return emojis[Math.floor(Math.random() * emojis.length)];
+export const getRandomEmoji = (category, exclude = []) => {
+  const categoryData = EMOJI_CATEGORIES[category];
+  if (!categoryData) return '';
+  const availableEmojis = categoryData.emojis.filter(e => !exclude.includes(e));
+  return availableEmojis.length > 0 
+    ? availableEmojis[Math.floor(Math.random() * availableEmojis.length)]
+    : '';
 };

@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
-import { GAME_STATUS, PLAYER, GAME_CONFIG } from '../Utils/constants.js';
-import { getRandomEmoji } from '../Utils/emojiCategories.js';
+import { GAME_STATUS, PLAYER, GAME_CONFIG } from '../Utils/constants';
+import { getRandomEmoji } from '../Utils/emojiCategories';
 import { 
   checkWinner, 
   canPlaceEmoji, 
   getUpdatedBoard, 
   getUpdatedPlayerPositions 
-} from '../Utils/gameLogic.js';
+} from '../Utils/gameLogic';
 
 export const useGameState = () => {
   const [gameStatus, setGameStatus] = useState(GAME_STATUS.CATEGORY_SELECTION);
@@ -42,36 +42,43 @@ export const useGameState = () => {
     if (gameStatus !== GAME_STATUS.PLAYING || winner) return false;
 
     const currentPlayerPositions = playerPositions[currentPlayer];
+    const currentPlayerEmojis = playerEmojis[currentPlayer] || [];
     
-    // Check if move is valid
     if (!canPlaceEmoji(board, cellIndex, currentPlayerPositions, currentPlayer)) {
       return false;
     }
 
-    // Get random emoji for current player
-    const emoji = getRandomEmoji(playerCategories[currentPlayer]);
-    
-    // Update board
+    // Get unique emoji from category that's not currently in use
+    const emoji = getRandomEmoji(
+      playerCategories[currentPlayer],
+      currentPlayerEmojis
+    );
+
+    if (!emoji) return false;
+
     const newBoard = getUpdatedBoard(board, cellIndex, emoji, currentPlayerPositions);
     
-    // Update player positions
     const newPlayerPositions = {
       ...playerPositions,
       [currentPlayer]: getUpdatedPlayerPositions(currentPlayerPositions, cellIndex)
     };
     
-    // Update player emojis
+    // Update player emojis with cycling logic
+    const updatedPlayerEmojis = [...currentPlayerEmojis];
+    if (updatedPlayerEmojis.length >= GAME_CONFIG.MAX_EMOJIS_PER_PLAYER) {
+      updatedPlayerEmojis.shift();
+    }
+    updatedPlayerEmojis.push(emoji);
+
     const newPlayerEmojis = {
       ...playerEmojis,
-      [currentPlayer]: [...playerEmojis[currentPlayer], emoji]
+      [currentPlayer]: updatedPlayerEmojis
     };
 
-    // Apply updates
     setBoard(newBoard);
     setPlayerPositions(newPlayerPositions);
     setPlayerEmojis(newPlayerEmojis);
 
-    // Check for winner
     const result = checkWinner(newBoard, newPlayerEmojis);
     
     if (result.winner) {
@@ -87,12 +94,12 @@ export const useGameState = () => {
         timestamp: new Date().toISOString()
       }]);
     } else {
-      // Switch player
       setCurrentPlayer(currentPlayer === PLAYER.ONE ? PLAYER.TWO : PLAYER.ONE);
     }
 
     return true;
-  }, [gameStatus, winner, currentPlayer, board, playerPositions, playerEmojis, playerCategories]);
+  }, [gameStatus, winner, currentPlayer, board, playerPositions, 
+      playerEmojis, playerCategories]);
 
   const startNewGame = useCallback(() => {
     setGameStatus(GAME_STATUS.CATEGORY_SELECTION);
