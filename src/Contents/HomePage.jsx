@@ -4,7 +4,7 @@ const HomePage = ({ onStartGame }) => {
   return (
     <div className="home-page">
       <div className="hero-section">
-        <h1>🎮 Blink Tac Toe</h1>
+        <h1>🎮 PickyPop   </h1>
         <p className="subtitle">A twisted version of Tic Tac Toe with vanishing emojis!</p>
         
         <div className="game-preview">

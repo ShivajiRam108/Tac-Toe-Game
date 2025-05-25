@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGameState } from '../Hooks/useGameState.js';
 import { useSound } from '../Hooks/useSound.js';
 import GameBoard from '../components/GameBoard.jsx';
@@ -7,6 +7,7 @@ import PlayerInfo from '../components/PlayerInfo.jsx';
 import GameStatus from '../components/GameStatus.jsx';
 import HelpModal from '../components/HelpModal.jsx';
 import ScoreTracker from '../components/ScoreTracker.jsx';
+import WinCelebration from '../components/WinCelebration.jsx';
 
 const GamePage = () => {
   const {
@@ -28,16 +29,37 @@ const GamePage = () => {
 
   const { playMoveSound, playWinSound } = useSound();
   const [showHelp, setShowHelp] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    // Get sound preference from localStorage or default to true
+    const savedPref = localStorage.getItem('soundEnabled');
+    return savedPref ? JSON.parse(savedPref) : true;
+  });
+  const [showCelebration, setShowCelebration] = useState(false);
+
+  // Save sound preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
+  }, [soundEnabled]);
 
   const handleCellClick = (cellIndex) => {
     const success = makeMove(cellIndex);
-    if (success) {
+    if (success && soundEnabled) {
       playMoveSound();
-      if (winner) {
-        setTimeout(playWinSound, 100);
-      }
     }
   };
+
+  const toggleSound = () => {
+    setSoundEnabled(prev => !prev);
+  };
+
+  useEffect(() => {
+    if (winner && soundEnabled) {
+      playWinSound();
+      setShowCelebration(true);
+      const timer = setTimeout(() => setShowCelebration(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [winner, playWinSound, soundEnabled]);
 
   const handlePlayAgain = () => {
     resetGame();
@@ -49,9 +71,18 @@ const GamePage = () => {
 
   return (
     <div className="game-page">
+      {showCelebration && <WinCelebration winner={winner} />}
+      
       <header className="game-header">
-        <h1>🎮 Blink Tac Toe</h1>
+        <h1>🎮 PickyPop</h1>
         <div className="header-controls">
+          <button 
+            className="sound-btn"
+            onClick={toggleSound}
+            aria-label={soundEnabled ? "Mute sound" : "Unmute sound"}
+          >
+            {soundEnabled ? '🔊' : '🔇'}
+          </button>
           <button 
             className="help-btn"
             onClick={() => setShowHelp(true)}
